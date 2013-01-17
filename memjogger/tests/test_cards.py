@@ -94,3 +94,21 @@ class TestEditingCards(Base):
         eq_(response.data, dict(errors = ['empty_field']))
         eq_(response.http.status_code, 422)
         
+class TestDeletingCards(Base):
+    def delete_card_test(self):
+        def handler(url, *args, **kwargs):
+            if urlparse(url).path == '/api/card/1':
+                return Mock(status_code = 200, text = '')
+        self.add_request_handler('delete', handler)
+        
+        response = self.api.delete_card(1)
+        eq_(response.http.status_code, 200)
+        
+    def delete_non_existing_card_test(self):
+        def handler(url, *args, **kwargs):
+            if urlparse(url).path == '/api/card/1':
+                return Mock(status_code = 404, text = '')
+        self.add_request_handler('delete', handler)
+        
+        response = self.api.delete_card(1)
+        eq_(response.http.status_code, 404)

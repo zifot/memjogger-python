@@ -86,3 +86,6 @@ class Handle:
     def update_card(self, card_id, q, a):
         return self._request('put', 'card/%s' % card_id, data = json.dumps(dict(q = q, a = a)))
         
+    def delete_card(self, card_id):
+        return self._request('delete', 'card/%s' % card_id)
+        
