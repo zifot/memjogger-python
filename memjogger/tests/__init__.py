@@ -39,6 +39,7 @@ class Base:
             
         self.add_request_handler('post', login_handler)
         self.add_request_handler(None, authentication_handler)
+        self.api = self.get_api_handle()
         
     def tearDown(self):
         for patcher in self.request_patchers.values():
