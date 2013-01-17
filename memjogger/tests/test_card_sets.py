@@ -41,7 +41,7 @@ class TestQueryingCardSets(Base):
 class TestCreatingCardSets(Base):
     def create_card_set_test(self):
         def handler(url, *args, **kwargs):
-            if urlparse(url).path == '/api/cardset':
+            if urlparse(url).path == '/api/cardset' and json.loads(kwargs['data']) == dict(name = 'cs1'):
                 return Mock(status_code = 200, text = json.dumps(dict(id=1)))
         self.add_request_handler('post', handler)
         
@@ -51,7 +51,7 @@ class TestCreatingCardSets(Base):
         
     def validation_error_test(self):
         def handler(url, *args, **kwargs):
-            if urlparse(url).path == '/api/cardset':
+            if urlparse(url).path == '/api/cardset' and json.loads(kwargs['data']) == dict(name = 'cs1'):
                 return Mock(status_code = 422, text = json.dumps(dict(errors = ['card_set_already_exists'])))
         self.add_request_handler('post', handler)
         
