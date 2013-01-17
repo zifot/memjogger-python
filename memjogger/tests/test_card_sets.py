@@ -36,7 +36,7 @@ class TestQueryingCardSets(Base):
         
         def handler(url, *args, **kwargs):
             if urlparse(url).path == '/api/cardset/1':
-                return Mock(status_code = 404)
+                return Mock(status_code = 404, text = '')
         self.add_request_handler('get', handler)
         
         response = api.get_card_set(1)
