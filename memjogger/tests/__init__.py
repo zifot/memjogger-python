@@ -16,7 +16,7 @@ def login_handler(url, *args, **kwargs):
 def authentication_handler(url, *args, **kwargs):
     auth = kwargs.get('auth')
     if not auth or auth.token != 'mjtoken':
-        return Mock(status_code = 401)  
+        return Mock(status_code = 401, text = '')
 
         
 class HandlerManager:
