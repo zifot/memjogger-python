@@ -73,3 +73,24 @@ class TestCreatingCards(Base):
         response = self.api.create_card(card_set_id = 1, q = '', a = 'a')
         eq_(response.data, dict(errors = ['empty_field']))
         eq_(response.http.status_code, 422)
+        
+class TestEditingCards(Base):
+    def edit_card_test(self):
+        def handler(url, *args, **kwargs):
+            if urlparse(url).path == '/api/card/1' and json.loads(kwargs['data']) == dict(a = 'a2', q = 'q2'):
+                return Mock(status_code = 200, text = '')
+        self.add_request_handler('put', handler)
+        
+        response = self.api.update_card(1, q = 'q2', a = 'a2')
+        eq_(response.http.status_code, 200)
+        
+    def validation_error_test(self):
+        def handler(url, *args, **kwargs):
+            if urlparse(url).path == '/api/card/1' and json.loads(kwargs['data']) == dict(a = '', q = 'q2'):
+                return Mock(status_code = 422, text = json.dumps(dict(errors = ['empty_field'])))
+        self.add_request_handler('put', handler)
+        
+        response = self.api.update_card(1, q = 'q2', a = '')
+        eq_(response.data, dict(errors = ['empty_field']))
+        eq_(response.http.status_code, 422)
+        

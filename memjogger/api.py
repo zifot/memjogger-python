@@ -82,3 +82,7 @@ class Handle:
             dt = datetime.datetime.strptime(toret.data['next_exam_date'], '%Y-%m-%d')
             toret.data['next_exam_date'] = datetime.date(dt.year, dt.month, dt.day)
         return toret
+        
+    def update_card(self, card_id, q, a):
+        return self._request('put', 'card/%s' % card_id, data = json.dumps(dict(q = q, a = a)))
+        
