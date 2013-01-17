@@ -65,3 +65,6 @@ class Handle:
         
     def update_card_set(self, id, new_name):
         return self._request('put', 'cardset/%s' % id, data = json.dumps(dict(name = new_name)))
+        
+    def delete_card_set(self, id):
+        return self._request('delete', 'cardset/%s' % id)

@@ -79,3 +79,22 @@ class TestEditingCardSets(Base):
         response = self.api.update_card_set(1, 'cs2')
         eq_(response.data, dict(errors = ['card_set_already_exists']))
         eq_(response.http.status_code, 422)
+        
+class TestDeletingCardSet(Base):
+    def delete_card_set_test(self):
+        def handler(url, *args, **kwargs):
+            if urlparse(url).path == '/api/cardset/1':
+                return Mock(status_code = 200, text = '')
+        self.add_request_handler('delete', handler)
+        
+        response = self.api.delete_card_set(1)
+        eq_(response.http.status_code, 200)
+        
+    def delete_non_existing_card_set_test(self):
+        def handler(url, *args, **kwargs):
+            if urlparse(url).path == '/api/cardset/1':
+                return Mock(status_code = 404, text = '')
+        self.add_request_handler('delete', handler)
+        
+        response = self.api.delete_card_set(1)
+        eq_(response.http.status_code, 404)
