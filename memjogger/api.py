@@ -1,5 +1,8 @@
 import requests
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Response:
     def __init__(self, http, data = None):
@@ -29,9 +32,12 @@ class Handle:
     
     def _request(self, type, path, do_auth = True, **kwargs):
         def call():
-            return getattr(requests, type)(API_URL + path, auth = self.auth, **kwargs)
+            url = API_URL + path
+            logger.debug('request: %s %s, %s' % (type.upper(), url, kwargs))
+            return getattr(requests, type)(url, auth = self.auth, **kwargs)
         
         response = call()
+        logger.debug('response: %s %s' % (response.status_code, response.text))
         if response.status_code == 401 and do_auth:
             self.authenticate()
             response = call()

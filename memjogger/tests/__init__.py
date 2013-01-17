@@ -1,10 +1,12 @@
 import requests
 import json
+import logging
 from mock import patch, Mock
 from urlparse import urlparse
 
 from memjogger.api import Handle
 
+logger = logging.getLogger(__name__)
 
 def login_handler(url, *args, **kwargs):
     if urlparse(url).path == '/api/user/login':
@@ -22,8 +24,10 @@ class HandlerManager:
         self.handlers = []
     def __call__(self, *args, **kwargs):
         for handler in self.handlers:
+            logger.debug('trying test handler: %s' % handler)
             ret = handler(*args, **kwargs)
             if ret is not None:
+                logger.debug('request handled')
                 return ret
     def add_handler(self, handler):
         self.handlers.append(handler)
