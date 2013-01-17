@@ -73,8 +73,8 @@ class Handle:
     def get_cards(self, card_set_id):
         return self._request('get', 'cardset/%s/cards' % card_set_id)
         
-    def get_card(self, card_set_id, card_id):
-        return self._request('get', 'cardset/%s/cards/%s' % (card_set_id, card_id))
+    def get_card(self, card_id):
+        return self._request('get', 'card/%s' % card_id)
         
     def create_card(self, card_set_id, q, a):
         toret = self._request('post', 'cardset/%s/cards' % card_set_id, data = json.dumps(dict(q = q, a = a)))
