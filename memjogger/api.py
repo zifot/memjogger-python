@@ -60,3 +60,5 @@ class Handle:
     def get_card_set(self, id):
         return self._request('get', 'cardset/%s' % id)
     
+    def create_card_set(self, name):
+        return self._request('post', 'cardset', data = json.dumps(dict(name = name)))
