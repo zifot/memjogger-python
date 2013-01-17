@@ -58,3 +58,24 @@ class TestCreatingCardSets(Base):
         response = self.api.create_card_set('cs1')
         eq_(response.data, dict(errors = ['card_set_already_exists']))
         eq_(response.http.status_code, 422)
+
+        
+class TestEditingCardSets(Base):
+    def edit_card_set_test(self):
+        def handler(url, *args, **kwargs):
+            if urlparse(url).path == '/api/cardset/1' and json.loads(kwargs['data']) == dict(name = 'cs2'):
+                return Mock(status_code = 200, text = '')
+        self.add_request_handler('put', handler)
+        
+        response = self.api.update_card_set(1, 'cs2')
+        eq_(response.http.status_code, 200)
+        
+    def validation_error_test(self):
+        def handler(url, *args, **kwargs):
+            if urlparse(url).path == '/api/cardset/1' and json.loads(kwargs['data']) == dict(name = 'cs2'):
+                return Mock(status_code = 422, text = json.dumps(dict(errors = ['card_set_already_exists'])))
+        self.add_request_handler('put', handler)
+        
+        response = self.api.update_card_set(1, 'cs2')
+        eq_(response.data, dict(errors = ['card_set_already_exists']))
+        eq_(response.http.status_code, 422)
