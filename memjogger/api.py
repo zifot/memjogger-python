@@ -27,12 +27,12 @@ class Handle:
         self.password = password
         self.auth = MemjoggerAuth()
     
-    def _request(self, type, path, **kwargs):
+    def _request(self, type, path, do_auth = True, **kwargs):
         def call():
             return getattr(requests, type)(API_URL + path, auth = self.auth, **kwargs)
         
         response = call()
-        if response.status_code == 401:
+        if response.status_code == 401 and do_auth:
             self.authenticate()
             response = call()
         if response.status_code == 401:
@@ -44,9 +44,9 @@ class Handle:
         return Response(response, body)
     
     def authenticate(self):
-        response = requests.post(API_URL + 'user/login', data = json.dumps(dict(email = self.email, passwd = self.password)))
-        if response.status_code == 200:
-            self.auth.token = json.loads(response.text)['token']
+        response = self._request('post', 'user/login', do_auth = False, data = json.dumps(dict(email = self.email, passwd = self.password)))
+        if response.http.status_code == 200:
+            self.auth.token = response.data['token']
     
     def get_card_sets(self): 
         return self._request('get', 'cardset')
