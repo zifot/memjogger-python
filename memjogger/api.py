@@ -45,4 +45,20 @@ class Handle:
         
         return Response(response, json.loads(response.text))
         
+    def get_card_set(self, id):
+        def call():
+            return requests.get(API_URL + ('cardset/%s' % id), auth = self.auth)
+        
+        response = call()
+        if response.status_code == 401:
+            self.authenticate()
+            response = call()
+        if response.status_code == 401:
+            return ErrorResponse(response)
+        
+        body = None
+        if response.status_code != 404:
+            body = json.loads(response.text)
+            
+        return Response(response, body)
     
