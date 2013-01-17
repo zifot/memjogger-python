@@ -68,3 +68,9 @@ class Handle:
         
     def delete_card_set(self, id):
         return self._request('delete', 'cardset/%s' % id)
+        
+    def get_cards(self, card_set_id):
+        return self._request('get', 'cardset/%s/cards' % card_set_id)
+        
+    def get_card(self, card_set_id, card_id):
+        return self._request('get', 'cardset/%s/cards/%s' % (card_set_id, card_id))
