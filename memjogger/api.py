@@ -12,6 +12,9 @@ class Response:
         
 class ErrorResponse(Response):
     pass
+    
+class InvalidMarkError:
+    pass
 
 class MemjoggerAuth(requests.auth.AuthBase):
     def __init__(self, token = ''):
@@ -88,4 +91,17 @@ class Handle:
         
     def delete_card(self, card_id):
         return self._request('delete', 'card/%s' % card_id)
+        
+    def mark_card(self, card_id, mark):
+        try:
+            mark = int(mark)
+            assert mark >= 1 and mark <= 5
+        except:
+            raise InvalidMarkError
+
+        toret =  self._request('post', 'card/%s/mark' % card_id, data = json.dumps(dict(mark = mark)))
+        if toret.data and 'next_exam_date' in toret.data:
+            dt = datetime.datetime.strptime(toret.data['next_exam_date'], '%Y-%m-%d')
+            toret.data['next_exam_date'] = datetime.date(dt.year, dt.month, dt.day)
+        return toret
         

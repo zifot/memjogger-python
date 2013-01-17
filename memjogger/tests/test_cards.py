@@ -2,10 +2,10 @@ import datetime
 from urlparse import urlparse
 from mock import Mock
 import json
-from nose.tools import eq_
+from nose.tools import eq_, assert_raises
 
 from memjogger.tests import Base
-from memjogger.api import ErrorResponse
+from memjogger.api import ErrorResponse, InvalidMarkError
 
 class TestQueryingCards(Base):
     def query_all_cards_test(self):
@@ -112,3 +112,30 @@ class TestDeletingCards(Base):
         
         response = self.api.delete_card(1)
         eq_(response.http.status_code, 404)
+        
+        
+class TestMarkingCards(Base):
+    def test_mark_card(self):
+        def handler(url, *args, **kwargs):
+            if urlparse(url).path == '/api/card/1/mark' and json.loads(kwargs['data']) == dict(mark = 5):
+                return Mock(status_code = 200, text = json.dumps(dict(next_exam_date = '2013-01-10')))
+        self.add_request_handler('post', handler)
+        
+        response = self.api.mark_card(1, 5)
+        eq_(response.http.status_code, 200)
+        eq_(response.data, dict(next_exam_date = datetime.date(2013, 1, 10)))
+        
+    def marking_non_existing_card_test(self):
+        def handler(url, *args, **kwargs):
+            if urlparse(url).path == '/api/card/1/mark':
+                return Mock(status_code = 404, text = '')
+        self.add_request_handler('post', handler)
+        
+        response = self.api.mark_card(1, 5)
+        eq_(response.http.status_code, 404)
+        eq_(response.data, None)
+        
+    def invalid_mark_test(self):
+        assert_raises(InvalidMarkError, self.api.mark_card, 1, 0)
+        assert_raises(InvalidMarkError, self.api.mark_card, 1, 6)
+        assert_raises(InvalidMarkError, self.api.mark_card, 1, 'k')
