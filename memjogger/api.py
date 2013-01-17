@@ -1,6 +1,7 @@
 import requests
 import json
 import logging
+import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -74,3 +75,10 @@ class Handle:
         
     def get_card(self, card_set_id, card_id):
         return self._request('get', 'cardset/%s/cards/%s' % (card_set_id, card_id))
+        
+    def create_card(self, card_set_id, q, a):
+        toret = self._request('post', 'cardset/%s/cards' % card_set_id, data = json.dumps(dict(q = q, a = a)))
+        if toret.data and 'next_exam_date' in toret.data:
+            dt = datetime.datetime.strptime(toret.data['next_exam_date'], '%Y-%m-%d')
+            toret.data['next_exam_date'] = datetime.date(dt.year, dt.month, dt.day)
+        return toret
